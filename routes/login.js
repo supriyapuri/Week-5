@@ -2,9 +2,7 @@ const { Router } = require("express");
 const router = Router();
 const jwt = require("jsonwebtoken");
 const secret = 'mount rainier';
-
 const bcrypt = require('bcrypt');
-
 const userDAO = require('../daos/users');
 
 
@@ -14,41 +12,39 @@ const userDAO = require('../daos/users');
 
 const isAuthorized = async(req,res,next) => {
     const auth =  req.headers.authorization;
-    if(auth){
+    if(!auth){
+        res.status(401).send("User not authorized");
+    }else{          
         const token = auth.split(' ')[1];
         try{
             const user = jwt.verify(token, secret)
-        if (user) {
-            req.user = user;
-            next();
-        } else {
-            res.sendStatus(401);
-        }
+            if (user) {
+                req.user = user;
+                next();
+            } else {
+                res.status(401).send("User not authorized");
+            }
         }catch (error){
-        res.sendStatus(401);
+            res.status(401).send("User not authorized");
         }
     }
-    else{
-        res.sendStatus(401);
-
-    }
+    
 };
 
 
  //signup
 
- router.post("/signup", async (req, res, next) => {
-    const {password } = req.body;
+router.post("/signup", async (req, res, next) => {
+    const { email, password } = req.body;
 
     if (!password || password === " " ){
-    res.status(400).send("password is required")
+        res.status(400).send("password is required")
     } else {
-    const newUser = await userDAO.signUp(req.body);
-    if(newUser){
-        res.json(newUser);
-        res.status(200).send('Account Created');
+        const newUser = await userDAO.signUp(email, password);
+        if(newUser){
+            res.json(newUser);
     } else{
-        res.status(409).send('User already exists')
+        res.status(409).send("Email already exists");
     }
     
     }
@@ -74,10 +70,10 @@ router.post("/", async (req, res ) => {
                     throw error;
                 }
             } else {
-                res.sendStatus(401);
+                res.status(401).send("User not authorized");
             }
         } else {
-            res.sendStatus(401);
+            res.status(401).send("User not authorized");
         }
     }   
 })
@@ -106,10 +102,11 @@ router.post("/password", isAuthorized, async(req,res)=>{
 
 });
 
-
-
+// Error handling middleware
+router.use(function (error, req, res, next){
+    if(error.message.includes("Internal Server Error")){
+        res.status(500).send("Sorry! Working on fixing the issue");
+    }
+});
 
 module.exports = router;
-
-
-

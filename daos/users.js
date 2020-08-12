@@ -9,25 +9,24 @@ const salt = 10;
 module.exports = {};
 
 
+module.exports.signUp = async (email, password) => {
 
-module.exports.signUp = async (userData) => {
-
-    let user = await User.findOne({ email: userData.email});
+    let user = await User.findOne({ email: email});
     if (user) {
         return false;
     } else {
 
-    const hashedPassword = await bcrypt.hash(userData.password, salt);    
+    const hashedPassword = await bcrypt.hash(password, salt);    
                 // new user
     try{
        const newUser = await User.create({
-            email: userData.email,
+            email: email,
             password: hashedPassword,
             roles: ['user']
-        });
-        return newUser; 
+            });
+            return newUser; 
         }catch(error){
-          throw error;
+            throw error;
         }
     }
       
@@ -68,7 +67,5 @@ module.exports.signUp = async (userData) => {
 };
 
 
-
-	
 
 
