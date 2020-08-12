@@ -65,14 +65,14 @@ module.exports.create = async (title, price) => {
 
  };
 
- module.exports.calcTotal = async (items) => {
+ module.exports.calculateSum = async (items) => {
     try {
         let total = 0;
         for (let i = 0; i < items.length; i++) {
             const validId = await mongoose.Types.ObjectId.isValid(items[i]);
             if (validId) {
                 const item = await Item.findOne({ _id: items[i] });
-                total += item.price
+                total = total + item.price;
             } else {
                 return undefined;
             }
@@ -85,8 +85,5 @@ module.exports.create = async (title, price) => {
 
 
 
-
-
-
- class BadDataError extends Error {};
+class BadDataError extends Error {};
 module.exports.BadDataError = BadDataError;
