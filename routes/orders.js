@@ -6,6 +6,9 @@ const secret = 'mount rainier';
 const orderDAO = require('../daos/orders');
 const itemDAO = require('../daos/items');
 
+
+// middleware for checking authorization 
+
 const isAuthorized = async(req,res,next) => {
     const auth =  req.headers.authorization;
     if(!auth){
@@ -27,25 +30,28 @@ const isAuthorized = async(req,res,next) => {
     
 };
 
-//create an order
+//create an order and add to cost of all the items from the time the order is placed
 
-router.post("/", isAuthorized, async (req,res,next)=>{
+router.post("/", isAuthorized, async (req,res)=>{
     const userId= req.user._id;
     const items = req.body;
     const total = await itemDAO.calculateSum(items);
 
-    if(total){
-            const newOrder = await orderDAO.create(userId, items, total);
+    if(!total){
+        res.sendStatus(400);
+    }else{
+        try{
+        const newOrder = await orderDAO.create(userId, items, total);
             if(newOrder){
                 res.json(newOrder);
             } else{
                 res.sendStatus(404);
             }
-    }else{
-        res.sendStatus(400);
+        }catch(error){
+            res.sendStatus(404)
+        }
     }
 
-    
 });
 
 
@@ -63,9 +69,9 @@ router.get("/", isAuthorized, async (req, res, next) => {
         } else {
             // get orders of that user
             const userId = req.user._id;
-            const myOrder = await orderDAO.getAllByUserId(userId);
-            if (myOrder) {
-                res.json(myOrder)
+            const userOrders = await orderDAO.getAllByUserId(userId);
+            if (userOrders) {
+                res.json(userOrders)
             } else {
                 res.sendStatus(404);
             }
@@ -98,6 +104,14 @@ router.get("/:id", isAuthorized, async(req,res,next) => {
         }else{
             res.sendStatus(404);
         }
+    }
+});
+
+
+// Error handling middleware
+router.use(function (error, req, res, next){
+    if(error.message.includes("Internal Server Error")){
+        res.status(500).send("Sorry! Working on the fix");
     }
 });
 

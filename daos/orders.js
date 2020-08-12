@@ -67,16 +67,15 @@ module.exports.getUserforId = async(orderId) => {
                     "items.price": 1,
                     "items.title": 1,
                     total: 1,
-                    userId: 1
-                } },
-                { $project: {
-                    _id: 0
+                    userId: 1,
+                    _id : 0
                 }}
+               
             ]);
             return order[0];
-        }catch(error){
+         }catch(error){
             throw error;
-        }
+         }
     }
 
 };

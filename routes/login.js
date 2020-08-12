@@ -105,7 +105,7 @@ router.post("/password", isAuthorized, async(req,res)=>{
 // Error handling middleware
 router.use(function (error, req, res, next){
     if(error.message.includes("Internal Server Error")){
-        res.status(500).send("Sorry! Working on fixing the issue");
+        res.status(500).send("Sorry! Working on the fix");
     }
 });
 
