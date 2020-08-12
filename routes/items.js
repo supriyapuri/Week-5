@@ -44,11 +44,12 @@ const isAdmin = async(req,res,next) => {
 //create an item 
 
 router.post("/", isAuthorized, isAdmin, async (req,res,next)=>{
-    const{title, price} = req.body;
-    if(!title || !price){
+    const itemTitle = req.body.title;
+    const itemPrice = req.body.price;
+    if(!itemTitle || !itemPrice ){
         res.status(400).send("Item title and price required")
         }else{
-            const newItem = await itemDAO.create(title, price);
+            const newItem = await itemDAO.create(itemTitle, itemPrice );
             if(newItem){
                 res.json(newItem);
             } else{
