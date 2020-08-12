@@ -43,8 +43,8 @@ router.post("/signup", async (req, res, next) => {
         const newUser = await userDAO.signUp(email, password);
         if(newUser){
             res.json(newUser);
-    } else{
-        res.status(409).send("Email already exists");
+        } else{
+            res.status(409).send("Email already exists");
     }
     
     }
