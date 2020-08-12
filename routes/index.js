@@ -3,8 +3,8 @@ const router = Router();
 
 
 router.use("/login", require("./login"));
-// router.use("/orders", require("./orders"));
-// router.use("/items", require("./items"));
+router.use("/orders", require("./orders"));
+router.use("/items", require("./items"));
 
 
 

@@ -1,10 +1,9 @@
 const { Router } = require("express");
 const router = Router();
 const jwt = require("jsonwebtoken");
-const secret = 'spongebob squarepants';
+const secret = 'mount rainier';
 
 const bcrypt = require('bcrypt');
-const e = require("express");
 
 const userDAO = require('../daos/users');
 
@@ -25,7 +24,7 @@ const isAuthorized = async(req,res,next) => {
         } else {
             res.sendStatus(401);
         }
-        }catch (e){
+        }catch (error){
         res.sendStatus(401);
         }
     }
@@ -39,16 +38,17 @@ const isAuthorized = async(req,res,next) => {
  //signup
 
  router.post("/signup", async (req, res, next) => {
-    const { email, password } = req.body;
+    const {password } = req.body;
 
     if (!password || password === " " ){
     res.status(400).send("password is required")
     } else {
-    const newUser = await userDAO.create(email, password);
+    const newUser = await userDAO.signUp(req.body);
     if(newUser){
         res.json(newUser);
+        res.status(200).send('Account Created');
     } else{
-        res.sendStatus(409);
+        res.status(409).send('User already exists')
     }
     
     }
@@ -70,8 +70,8 @@ router.post("/", async (req, res ) => {
                 try {
                     const token = jwt.sign(savedUser.toJSON(), secret);
                     res.json({ token });
-                } catch (e) {
-                    throw e;
+                } catch (error) {
+                    throw error;
                 }
             } else {
                 res.sendStatus(401);
@@ -92,7 +92,6 @@ router.post("/password", isAuthorized, async(req,res)=>{
 
     if (!password || password === ' ') {
         res.status(400).send('Please provide password');
-
     } else if (req.headers.authorization.includes('BAD')) {
         res.sendStatus(401);
     }

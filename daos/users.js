@@ -9,35 +9,21 @@ const salt = 10;
 module.exports = {};
 
 
-// module.exports.signup = async (email, password) =&gt; {
-//     const passwordHash = await bcrypt.hash(password, 10);
-//     try {
-//     const newUser = await User.create({
-//     email: email,
-//     password: passwordHash,
-//     roles: [&#39;user&#39;]
-//     });
-//     return newUser;
-//     } catch (e) {
-//     throw e;
-//     }
-//     };
 
+module.exports.signUp = async (userData) => {
 
-module.exports.create = async (email, password) => {
-
-    let user = await User.findOne({ email: email});
+    let user = await User.findOne({ email: userData.email});
     if (user) {
         return false;
     } else {
 
-    const hashedPassword = await bcrypt.hash(password, salt);    
+    const hashedPassword = await bcrypt.hash(userData.password, salt);    
                 // new user
     try{
        const newUser = await User.create({
-        email: email,
-        password: hashedPassword,
-        roles: ['user']
+            email: userData.email,
+            password: hashedPassword,
+            roles: ['user']
         });
         return newUser; 
         }catch(error){
@@ -80,6 +66,7 @@ module.exports.create = async (email, password) => {
           return updatedUser;
         } 
 };
+
 
 
 	
